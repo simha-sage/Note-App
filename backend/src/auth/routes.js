@@ -119,4 +119,33 @@ router.post("/logout", (req, res) => {
   res.json({ message: "Logged out" });
 });
 
+import Note from "../models/note.js";
+
+router.post("/notes", authMiddleware, async (req, res) => {
+  const { subject, content, visibility, type } = req.body;
+
+  const note = await Note.create({
+    subject,
+    content,
+    visibility,
+    owner: req.user.id,
+    type,
+  });
+
+  res.status(201).json(note);
+});
+
+router.get("/getNotes", authMiddleware, async (req, res) => {
+  try {
+    let query = {
+      $or: [{ visibility: "ADMIN_ONLY" }, { owner: req.user.id }],
+    };
+
+    const notes = await Note.find(query).sort({ createdAt: -1 });
+
+    res.status(200).json(notes);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch notes" });
+  }
+});
 export default router;
