@@ -40,12 +40,12 @@ const AddNote = ({ setData, currentMain }) => {
   };
 
   return (
-    <div className="h-full bg-amber-200 p-6">
+    <div className="h-full bg-gray-200 p-6 flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-2xl bg-amber-100 rounded-xl shadow-lg p-6"
+        className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6"
       >
-        <h1 className="text-2xl font-semibold mb-6 text-amber-900">
+        <h1 className="text-2xl font-semibold mb-6 text-gray-900">
           Add New Note
         </h1>
 
@@ -56,7 +56,7 @@ const AddNote = ({ setData, currentMain }) => {
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           required
-          className="w-full mb-4 p-3 rounded bg-white border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="w-full mb-4 p-3 rounded bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
         />
 
         {/* Content */}
@@ -66,14 +66,14 @@ const AddNote = ({ setData, currentMain }) => {
           onChange={(e) => setContent(e.target.value)}
           required
           rows="6"
-          className="w-full mb-4 p-3 rounded bg-white border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="w-full mb-4 p-3 rounded bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
         />
 
         {/* Visibility */}
         <select
           value={visibility}
           onChange={(e) => setVisibility(e.target.value)}
-          className="w-full mb-6 p-3 rounded bg-white border border-amber-300 focus:outline-none"
+          className="w-full mb-6 p-3 rounded bg-white border border-gray-300 focus:outline-none"
         >
           <option value="PRIVATE">Private</option>
           <option value="ADMIN_ONLY">Visible to Admin</option>
@@ -82,7 +82,7 @@ const AddNote = ({ setData, currentMain }) => {
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="w-full mb-6 p-3 rounded bg-white border border-amber-300 focus:outline-none"
+          className="w-full mb-6 p-3 rounded bg-white border border-gray-300 focus:outline-none"
         >
           <option value="personal">Personal</option>
           <option value="permissions">Permissions</option>
@@ -93,7 +93,7 @@ const AddNote = ({ setData, currentMain }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-amber-400 hover:bg-amber-500 text-white font-semibold py-3 rounded transition"
+          className="w-full bg-gray-400 hover:bg-gray-500 text-white font-semibold py-3 rounded transition"
         >
           {loading ? "Submitting..." : "Submit Note"}
         </button>
@@ -122,13 +122,13 @@ const Secondary = ({ currentMain, data, setData }) => {
   }, [currentMain, data, searchTerm]);
 
   return (
-    <div className="flex h-screen">
-      <div className="w-4/12 bg-green-600 p-6 shadow flex flex-col">
-        <h1 className="text-2xl font-bold mb-4"> {currentMain}</h1>
-        <div className="flex flex-col gap-3 p-4 bg-amber-200 rounded-lg">
+    <div className="flex h-screen border-l border-gray-300">
+      <div className="w-4/12 bg-gray-50  shadow flex flex-col">
+        <h1 className="text-xl font-bold mb-4 mx-8 mt-8"> {currentMain}</h1>
+        <div className="flex flex-col gap-3 p-4 m-4  rounded-lg">
           <input
             type="text"
-            className="bg-amber-100 p-2 rounded"
+            className="bg-gray-200 p-2 rounded"
             placeholder="Search"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -136,12 +136,12 @@ const Secondary = ({ currentMain, data, setData }) => {
           <input
             type="button"
             value="+ADD NOTE"
-            className="bg-amber-300 p-2 rounded"
+            className="bg-gray-200 to-green-500 p-2 rounded  font-bold text-center cursor-pointer hover:bg-gray-300"
             onClick={() => setSelectedNote(null)}
           />
         </div>
         {/* list of notes */}
-        <div className="flex-1 overflow-y-auto mt-4 bg-amber-100 rounded-xl shadow-lg p-4">
+        <div className="flex-1 overflow-y-auto mt-4  ">
           {data.length === 0 && (
             <p className="text-amber-700 text-center">No notes available</p>
           )}
@@ -150,14 +150,22 @@ const Secondary = ({ currentMain, data, setData }) => {
             <div
               key={item._id || item.id}
               onClick={() => setSelectedNote(item)}
-              className={`cursor-pointer p-3 mb-2 rounded border transition truncate
-  ${
-    selectedNote?._id === item._id
-      ? "bg-amber-200 border-amber-400"
-      : "bg-white border-amber-300 hover:bg-amber-50"
-  }`}
+              className={`cursor-pointer pt-3 px-8 h-32 transition  border-b border-gray-300
+      ${selectedNote?._id === item._id ? "bg-gray-200" : " hover:bg-white"}`}
             >
-              {item.subject || "Untitled Note"}
+              <p className="text-xs text-gray-500 mb-1 text-right">
+                {item.createdAt.substring(8, 10)}/
+                {item.createdAt.substring(5, 7)}/
+                {item.createdAt.substring(0, 4)}
+              </p>
+              {/* Subject – max 1 line */}
+              <h2 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
+                {item.subject || "Untitled Note"}
+              </h2>
+              {/* Content – max 2 lines */}
+              <p className="text-gray-600 text-sm line-clamp-2">
+                {item.content}
+              </p>
             </div>
           ))}
         </div>
@@ -165,18 +173,18 @@ const Secondary = ({ currentMain, data, setData }) => {
 
       <div className="w-8/12">
         {selectedNote ? (
-          <div className="h-full bg-amber-200 p-8 overflow-y-auto">
-            <div className="max-w-4xl mx-auto bg-amber-100 rounded-2xl shadow-xl p-8">
+          <div className="h-full bg-gray-100 p-8 overflow-y-auto">
+            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
               {/* Subject */}
-              <h1 className="text-3xl font-bold text-amber-900 mb-6 break-words sticky top-0 bg-amber-100 py-2">
+              <h1 className="text-3xl font-bold text-gray-900 mb-6 break-words sticky top-0  py-2">
                 {selectedNote.subject || "Untitled Note"}
               </h1>
 
               {/* Divider */}
-              <hr className="border-amber-300 mb-6" />
+              <hr className="border-gray-300 mb-6" />
 
               {/* Content */}
-              <p className="text-lg text-amber-800 leading-relaxed whitespace-pre-wrap break-words">
+              <p className="text-lg text--800 leading-relaxed whitespace-pre-wrap break-words">
                 {selectedNote.content || "No content available."}
               </p>
             </div>
@@ -252,28 +260,31 @@ export default function DashboardPage() {
 
   return (
     <div className="flex relative min-h-screen">
-      <div className="w-2.5/12 min-h-screen bg-green-300 p-6  shadow ">
+      <div className="w-2.5/12 min-h-screen bg-gradient-to-r from-gray-200 to-white  shadow ">
         <div className="flex flex-col  justify-between mb-4">
-          <div className="flex justify-spacebetween items-center  mb-4">
-            <div className="w-12 h-12 bg-amber-500 rounded-full ">
+          <div className="flex justify-spacebetween items-center px-6 pt-4 mb-4">
+            <div className="w-12 h-12 bg-red-500 rounded-full ">
               <h1 className="text-center text-[24px] font-bold text-white mt-1">
                 {user.name.charAt(0).toUpperCase()}
               </h1>
             </div>
             <h1 className="text-xl m-4 font-semibold">
-              {user.name.toUpperCase()} ({user.role})
+              {user.name.toUpperCase()}
             </h1>
           </div>
-
+          <p className="px-6 pb-5 text-gray-700 font-extralight">
+            Welcome to user dashboard
+          </p>
+          <hr className="border-gray-700" />
           <div>
             <nav className="flex-1 mt-4">
               {[
                 {
-                  name: "Personal ",
+                  name: "Personal",
                   action: () => setCurrentMain("Personal"),
                 },
                 {
-                  name: "Admin Orders",
+                  name: "AdminOrders",
                   action: () => setCurrentMain("AdminOrders"),
                 },
                 {
@@ -287,7 +298,12 @@ export default function DashboardPage() {
               ].map((item, index) => (
                 <p
                   key={index}
-                  className="ml-6 mr-4 my-2 py-2 px-3 font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-500 hover:text-amber-300"
+                  className={`cursor-pointer px-8 py-3 mb-2  transition truncate
+  ${
+    currentMain === item.name
+      ? "bg-gradient-to-r bg-gradient-to-r from-gray-400 to-white "
+      : "bg-gradient-to-r from-gray-200 to-white  hover:from-gray-300"
+  }`}
                   onClick={item.action}
                 >
                   {item.name}
@@ -296,7 +312,7 @@ export default function DashboardPage() {
             </nav>
           </div>
 
-          <div className="flex-col justify-between items-center mb-4 absolute bottom-6">
+          <div className="flex-col justify-between items-center px-8 mb-4 absolute bottom-6">
             <button
               onClick={handleLogout}
               className="text-sm bg-red-500 text-white px-3 py-1 rounded"
