@@ -102,7 +102,7 @@ const AddNote = ({ setData, currentMain }) => {
   );
 };
 
-const Secondary = ({ currentMain, data, setData }) => {
+const Secondary = ({ currentMain, data, setData, user }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedNote, setSelectedNote] = useState(null);
   const handleSearchChange = (e) => {
@@ -133,12 +133,14 @@ const Secondary = ({ currentMain, data, setData }) => {
             value={searchTerm}
             onChange={handleSearchChange}
           />
-          <input
-            type="button"
-            value="+ADD NOTE"
-            className="bg-gray-200 to-green-500 p-2 rounded  font-bold text-center cursor-pointer hover:bg-gray-300"
-            onClick={() => setSelectedNote(null)}
-          />
+          {!(user?.role === "user" && currentMain === "AdminOrders") && (
+            <input
+              type="button"
+              value="+ADD NOTE"
+              className="bg-gray-200 p-2 rounded font-bold text-center cursor-pointer hover:bg-gray-300"
+              onClick={() => setSelectedNote(null)}
+            />
+          )}
         </div>
         {/* list of notes */}
         <div className="flex-1 overflow-y-auto mt-4  ">
@@ -153,11 +155,19 @@ const Secondary = ({ currentMain, data, setData }) => {
               className={`cursor-pointer pt-3 px-8 h-32 transition  border-b border-gray-300
       ${selectedNote?._id === item._id ? "bg-gray-200" : " hover:bg-white"}`}
             >
-              <p className="text-xs text-gray-500 mb-1 text-right">
-                {item.createdAt.substring(8, 10)}/
-                {item.createdAt.substring(5, 7)}/
-                {item.createdAt.substring(0, 4)}
-              </p>
+              <div className="flex justify-between items-center">
+                {user.role === "admin" && (
+                  <span className="text-xs text-gray-500 mb-1 ">
+                    {user.name.toUpperCase()}
+                  </span>
+                )}
+
+                <span className="text-xs text-gray-500 mb-1 text-right">
+                  {item.createdAt.substring(8, 10)}/
+                  {item.createdAt.substring(5, 7)}/
+                  {item.createdAt.substring(0, 4)}
+                </span>
+              </div>
               {/* Subject – max 1 line */}
               <h2 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
                 {item.subject || "Untitled Note"}
@@ -189,8 +199,14 @@ const Secondary = ({ currentMain, data, setData }) => {
               </p>
             </div>
           </div>
-        ) : (
+        ) : !(user?.role === "user" && currentMain === "AdminOrders") ? (
           <AddNote setData={setData} currentMain={currentMain} />
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            <h1 className="text-2xl font-semibold text-gray-700">
+              You do not have permission to add notes in AdminOrders.
+            </h1>
+          </div>
         )}
       </div>
     </div>
@@ -198,10 +214,7 @@ const Secondary = ({ currentMain, data, setData }) => {
 };
 
 export default function DashboardPage() {
-  const [data, setData] = useState([
-    { id: 1, text: "Sample note" },
-    { id: 2, text: "Another note" },
-  ]);
+  const [data, setData] = useState([]);
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(false);
   const [currentMain, setCurrentMain] = useState("Personal");
@@ -230,6 +243,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     (async () => {
+      if (!user || user.role !== "user") return;
       try {
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/auth/getNotes`,
@@ -241,6 +255,27 @@ export default function DashboardPage() {
         if (!res.ok) throw new Error("Failed to fetch notes");
         const notes = await res.json();
         setData(notes);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!user || user.role === "user") return;
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/auth/getAllNotes`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (!res.ok) throw new Error("Failed to fetch notes");
+        const notes = await res.json();
+        setData(notes);
+        console.log("Admin notes data:", notes);
       } catch (err) {
         console.error(err);
       }
@@ -260,7 +295,11 @@ export default function DashboardPage() {
 
   return (
     <div className="flex relative min-h-screen">
-      <div className="w-2.5/12 min-h-screen bg-gradient-to-r from-gray-200 to-white  shadow ">
+      <div
+        className={`w-2.5/12 min-h-screen bg-gradient-to-r ${
+          user.role === "admin" ? "from-red-200" : "from-green-200"
+        } to-white  shadow `}
+      >
         <div className="flex flex-col  justify-between mb-4">
           <div className="flex justify-spacebetween items-center px-6 pt-4 mb-4">
             <div className="w-12 h-12 bg-red-500 rounded-full ">
@@ -273,7 +312,9 @@ export default function DashboardPage() {
             </h1>
           </div>
           <p className="px-6 pb-5 text-gray-700 font-extralight">
-            Welcome to user dashboard
+            {user.role !== "user"
+              ? "Welcome to admin dashboard"
+              : "Welcome to user dashboard"}
           </p>
           <hr className="border-gray-700" />
           <div>
@@ -301,8 +342,12 @@ export default function DashboardPage() {
                   className={`cursor-pointer px-8 py-3 mb-2  transition truncate
   ${
     currentMain === item.name
-      ? "bg-gradient-to-r bg-gradient-to-r from-gray-400 to-white "
-      : "bg-gradient-to-r from-gray-200 to-white  hover:from-gray-300"
+      ? `bg-gradient-to-r ${
+          user.role === "admin" ? "from-red-400" : "from-green-400"
+        }`
+      : `${
+          user.role === "admin" ? "from-red-400" : "from-green-200"
+        }  hover:from-gray-300`
   }`}
                   onClick={item.action}
                 >
@@ -325,7 +370,12 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="w-10/12 min-h-screen">
-        <Secondary currentMain={currentMain} data={data} setData={setData} />
+        <Secondary
+          currentMain={currentMain}
+          data={data}
+          setData={setData}
+          user={user}
+        />
       </div>
     </div>
   );

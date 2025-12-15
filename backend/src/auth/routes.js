@@ -148,4 +148,22 @@ router.get("/getNotes", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch notes" });
   }
 });
+
+router.get("/getAllNotes", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const query = {
+      $or: [
+        { visibility: { $ne: "PRIVATE" } }, // all non-private notes
+        { owner: userId, visibility: "PRIVATE" }, // own private notes
+      ],
+    };
+
+    const notes = await Note.find(query).sort({ createdAt: -1 });
+
+    res.status(200).json(notes);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch notes" });
+  }
+});
 export default router;
