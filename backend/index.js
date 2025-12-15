@@ -11,6 +11,8 @@ const PORT = 3000;
 app.use(cookieParser());
 app.use(express.json());
 
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -19,8 +21,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
-
-app.set("trust proxy", 1);
 
 app.use("/auth", authRoutes);
 

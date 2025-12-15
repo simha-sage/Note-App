@@ -42,6 +42,7 @@ router.post("/signup", async (req, res) => {
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      path: "/",
     });
 
     return res.status(201).json({
@@ -81,6 +82,7 @@ router.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      path: "/",
     });
 
     return res.json({
