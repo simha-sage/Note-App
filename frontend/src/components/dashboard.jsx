@@ -259,7 +259,7 @@ export default function DashboardPage() {
         console.error(err);
       }
     })();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     (async () => {
@@ -280,7 +280,7 @@ export default function DashboardPage() {
         console.error(err);
       }
     })();
-  }, []);
+  }, [user]);
 
   async function handleLogout() {
     await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
