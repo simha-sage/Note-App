@@ -13,8 +13,22 @@ const options = {
         url: "http://localhost:5000/api/v1",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ["./src/auth/routes.js"],
+  apis: ["./src/auth/routes.js"], // path is OK
 };
 
 export default swaggerJsdoc(options);
