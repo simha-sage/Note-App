@@ -7,6 +7,8 @@ import swaggerUI from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
 //
 
+const app = express();
+
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 import authRoutes from "./src/auth/routes.js";
@@ -14,7 +16,6 @@ import authRoutes from "./src/auth/routes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set("trust proxy", 1);
