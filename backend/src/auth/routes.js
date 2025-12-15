@@ -14,6 +14,36 @@ function signToken(payload) {
 
 const router = Router();
 
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: john@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Validation error
+ */
+
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -62,6 +92,33 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: john@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       400:
+ *         description: Invalid credentials
+ */
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -99,6 +156,21 @@ router.post("/login", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get logged-in user details
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile returned
+ *       401:
+ *         description: Unauthorized
+ */
+
 router.get("/me", authMiddleware, async (req, res) => {
   const user = req.user;
   res.json({
@@ -121,12 +193,53 @@ function authMiddleware(req, res, next) {
   }
 }
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ */
+
 router.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logged out" });
 });
 
 import Note from "../models/note.js";
+
+/**
+ * @swagger
+ * /auth/notes:
+ *   post:
+ *     summary: Create a new note
+ *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [subject, content]
+ *             properties:
+ *               subject:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               visibility:
+ *                 type: string
+ *                 example: PRIVATE
+ *               type:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Note created
+ */
 
 router.post("/notes", authMiddleware, async (req, res) => {
   const { subject, content, visibility, type } = req.body;
@@ -142,6 +255,19 @@ router.post("/notes", authMiddleware, async (req, res) => {
   res.status(201).json(note);
 });
 
+/**
+ * @swagger
+ * /auth/getNotes:
+ *   get:
+ *     summary: Get notes (admin-only + own notes)
+ *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Notes fetched successfully
+ */
+
 router.get("/getNotes", authMiddleware, async (req, res) => {
   try {
     let query = {
@@ -155,6 +281,19 @@ router.get("/getNotes", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch notes" });
   }
 });
+
+/**
+ * @swagger
+ * /auth/getAllNotes:
+ *   get:
+ *     summary: Get all non-private notes and own private notes
+ *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Notes fetched
+ */
 
 router.get("/getAllNotes", authMiddleware, async (req, res) => {
   try {
