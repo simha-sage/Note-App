@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-const swaggerUI = require("swagger-ui-express");
-const swaggerSpec = require("./swagger");
+import swaggerUI from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
+//
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
