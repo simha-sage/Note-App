@@ -2,6 +2,8 @@
 
 A robust authentication and authorization system implementing role-based access control (RBAC) for secure user management.
 
+Live demo link: [Click here](https://note-app-p8s8.onrender.com/)
+
 ## Features
 
 - User authentication (login/registration)
