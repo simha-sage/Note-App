@@ -14,7 +14,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/*.js"],
+  apis: ["./src/auth/routes.js"],
 };
 
 export default swaggerJsdoc(options);
